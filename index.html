@@ -13,6 +13,8 @@
     --border: rgba(30,41,72,.09);
     --accent: #4f6bf5;
     --accent-weak: rgba(79,107,245,.10);
+    --warn:   #b45309;
+    --warn-weak: rgba(245,158,11,.13);
     --glow-1: rgba(99,102,241,.16);
     --glow-2: rgba(34,211,238,.12);
     --shadow: 0 10px 30px rgba(30,41,72,.10);
@@ -26,6 +28,8 @@
       --border: rgba(255,255,255,.09);
       --accent: #7d93ff;
       --accent-weak: rgba(125,147,255,.12);
+      --warn:   #fbbf24;
+      --warn-weak: rgba(251,191,36,.10);
       --glow-1: rgba(99,102,241,.22);
       --glow-2: rgba(34,211,238,.10);
       --shadow: 0 12px 32px rgba(0,0,0,.45);
@@ -33,7 +37,6 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
                  "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -60,7 +63,6 @@
     font-size: 12.5px; font-weight: 600; letter-spacing: .5px;
     color: var(--accent);
     background: var(--accent-weak);
-    border: 1px solid transparent;
     padding: 6px 14px; border-radius: 999px;
     margin-bottom: 18px;
   }
@@ -91,7 +93,6 @@
   .tip {
     margin: 26px auto 0;
     display: flex; gap: 12px; align-items: flex-start;
-    max-width: 640px;
     padding: 14px 18px;
     border-radius: 14px;
     border: 1px solid var(--border);
@@ -102,9 +103,24 @@
   .tip .icon { font-size: 18px; line-height: 1.4; }
   .tip b { color: var(--text); font-weight: 600; }
 
+  /* ---------- 分组 ---------- */
+  .section { margin-top: 40px; }
+  .sec-title {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 17px; font-weight: 800; letter-spacing: .3px;
+  }
+  .sec-title::before {
+    content: ""; width: 4px; height: 17px; border-radius: 2px;
+    background: linear-gradient(180deg, #6366f1, #22d3ee);
+  }
+  .sec-note {
+    margin-top: 8px; font-size: 12.5px; line-height: 1.7;
+    color: var(--muted); max-width: 660px;
+  }
+
   /* ---------- 站点卡片 ---------- */
   .grid {
-    margin-top: 34px;
+    margin-top: 16px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
@@ -141,14 +157,31 @@
     box-shadow: inset 0 -8px 14px rgba(0,0,0,.14);
   }
   .name { font-size: 16.5px; font-weight: 700; letter-spacing: .2px; }
+  .status {
+    margin-left: auto; flex: none;
+    font-size: 11px; font-weight: 600;
+    color: var(--warn); background: var(--warn-weak);
+    padding: 3.5px 10px; border-radius: 999px;
+  }
   .desc { font-size: 13.5px; line-height: 1.7; color: var(--text-2); }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
   .tag {
     font-size: 11px; font-weight: 600; letter-spacing: .3px;
-    color: var(--muted);
+    color: var(--accent);
     padding: 3px 9px; border-radius: 999px;
-    border: 1px solid var(--border);
+    background: var(--accent-weak);
   }
+  .stats { display: flex; gap: 8px; margin-top: 2px; }
+  .stat {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 10px; border-radius: 10px;
+    background: var(--accent-weak);
+    font-size: 12.5px; color: var(--text-2);
+    white-space: nowrap;
+  }
+  .stat b { color: var(--accent); font-weight: 700; }
+  .meta { margin-top: 2px; font-size: 12px; line-height: 1.6; color: var(--muted); }
   .go {
     margin-top: auto; padding-top: 12px;
     display: flex; align-items: center; gap: 5px;
@@ -186,23 +219,93 @@
 
   <div class="tip">
     <span class="icon">💡</span>
-    <span><b>从下方邀请链接注册，可以获得比直接注册更多的初始额度</b>，而且不损失你本身的任何权益。点击卡片即可直达注册页。</span>
+    <span><b>从下方邀请链接注册，可获得比直接注册更多的初始额度</b>，且不损失你本身的任何权益；公益站额度主要靠每日签到积累，注册后记得天天签到。点击卡片即可直达注册页。</span>
   </div>
 
-  <div class="grid" id="links"></div>
+  <main id="main"></main>
 
   <footer id="footer"></footer>
 </div>
 
 <!-- ================================================================
-     在这里维护站点列表（其他地方都不用动）
-     name: 站点名   url: 你的邀请链接   desc: 一句话介绍
-     tags: 标签数组，可以不写，不影响显示
+     在这里维护站点数据（其他地方都不用动）
+     GROUPS: 分组列表，每组 { title, note(可省略), sites: [...] }
+     每个站点支持以下字段（除 name/url 外都可省略）：
+       name    站点名          url     邀请链接
+       desc    一句话介绍      models  支持的模型（标签）
+       signup  注册方式        price   参考价格
+       bonus   注册赠送        daily   每日签到额度
+       nomodel 填 true 显示「暂无模型」标记
 ================================================================= -->
 <script>
-const LINKS = [
-  { name: "示例站点 A", url: "https://example.com/aff?code=xxxx", desc: "这是一个示例条目，替换成真实站点即可", tags: ["GPT", "免费"] },
-  { name: "示例站点 B", url: "https://example2.com/aff?code=yyyy", desc: "tags 可以不写，不影响显示" },
+const GROUPS = [
+  {
+    title: "综合推荐",
+    sites: [
+      {
+        name: "Any Router",
+        url: "https://anyrouter.top/register?aff=YKzT",
+        desc: "公认最强公益站，API 计费纯正、上新模型最快；高峰期调用需排队，体验会有些卡顿。",
+        models: ["gpt-6", "fable-5.1"],
+        signup: "Linux.do / 国内教育邮箱",
+        price: "参考 入 $4/M · 出 $2/M",
+        bonus: "$75",
+        daily: "$25",
+      },
+      {
+        name: "Agent Router",
+        url: "https://agentrouter.org/register?aff=4ReK",
+        desc: "模型覆盖面广，日常使用丝滑；GPT 与 Opus 每日全站限量。",
+        models: ["gpt-5.6", "opus-5", "glm-5.3", "deepseek-v4-flash"],
+        signup: "Linux.do / GitHub ≥1 年",
+        price: "参考 入 $3/M · 出 $15/M",
+        bonus: "$50",
+        daily: "$25",
+      },
+    ],
+  },
+  {
+    title: "TaBiAI 系列 · 同一站长",
+    note: "同一站长运营的四站，注册赠送与签到额度各不相同；价格随模型浮动，以下均为参考。目前除 JustDoWork 外暂未上架模型。",
+    sites: [
+      {
+        name: "TaBiAI",
+        url: "https://tabitoken.com/sign-up?aff=1UkR",
+        desc: "系列主站，注册赠送额度最高；按请求计费，thinking 模型略贵。",
+        bonus: "$100",
+        daily: "$5-10",
+        price: "参考 ~$0.35/请求（thinking $0.4）",
+        nomodel: true,
+      },
+      {
+        name: "GoRouter",
+        url: "https://gorouter.app/sign-up?aff=dj8W",
+        desc: "系列中单价最低的按请求计费站。",
+        bonus: "$50",
+        daily: "$5-10",
+        price: "参考 ~$0.2/请求",
+        nomodel: true,
+      },
+      {
+        name: "JustDoWork",
+        url: "https://api.justwoker.icu/register?aff=6gq7",
+        desc: "系列中目前唯一上架模型的站，按 token 计费，签到额度也最高。",
+        models: ["gpt-5.6sol"],
+        bonus: "$70",
+        daily: "$25-30",
+        price: "参考 入/出 $0.65/M",
+      },
+      {
+        name: "KKToken AI",
+        url: "https://kktoken.cc/sign-up?aff=lwvh",
+        desc: "按 token 计费，签到额度稳定。",
+        bonus: "$75",
+        daily: "$20",
+        price: "参考 入/出 $1/M",
+        nomodel: true,
+      },
+    ],
+  },
 ];
 
 const GRADS = [
@@ -214,28 +317,53 @@ const GRADS = [
 ];
 const ARROW = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 
-const box = document.getElementById("links");
+const main = document.getElementById("main");
+let idx = 0;
+const total = GROUPS.reduce((n, g) => n + g.sites.length, 0);
 
-if (LINKS.length === 0) {
+if (total === 0) {
   const e = document.createElement("div");
   e.className = "empty";
   e.textContent = "清单整理中，敬请期待～";
-  box.appendChild(e);
-} else {
-  LINKS.forEach((l, i) => {
+  main.appendChild(e);
+}
+
+GROUPS.forEach(g => {
+  if (g.sites.length === 0) return;
+
+  const sec = document.createElement("div");
+  sec.className = "section";
+
+  if (g.title) {
+    const t = document.createElement("div");
+    t.className = "sec-title";
+    t.textContent = g.title;
+    sec.appendChild(t);
+  }
+  if (g.note) {
+    const n = document.createElement("p");
+    n.className = "sec-note";
+    n.textContent = g.note;
+    sec.appendChild(n);
+  }
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+
+  g.sites.forEach(l => {
     const a = document.createElement("a");
     a.className = "card";
     a.href = l.url;
     a.target = "_blank";
     a.rel = "noopener";
-    a.style.animationDelay = (i * 70) + "ms";
+    a.style.animationDelay = (idx * 70) + "ms";
 
     const row = document.createElement("div");
     row.className = "row";
 
     const av = document.createElement("span");
     av.className = "avatar";
-    av.style.background = GRADS[i % GRADS.length];
+    av.style.background = GRADS[idx % GRADS.length];
     av.textContent = (l.name || "?").trim().charAt(0);
 
     const name = document.createElement("span");
@@ -244,17 +372,26 @@ if (LINKS.length === 0) {
 
     row.appendChild(av);
     row.appendChild(name);
+
+    if (l.nomodel) {
+      const st = document.createElement("span");
+      st.className = "status";
+      st.textContent = "暂无模型";
+      row.appendChild(st);
+    }
     a.appendChild(row);
 
-    const desc = document.createElement("span");
-    desc.className = "desc";
-    desc.textContent = l.desc;
-    a.appendChild(desc);
+    if (l.desc) {
+      const desc = document.createElement("span");
+      desc.className = "desc";
+      desc.textContent = l.desc;
+      a.appendChild(desc);
+    }
 
-    if (Array.isArray(l.tags) && l.tags.length) {
+    if (Array.isArray(l.models) && l.models.length) {
       const tags = document.createElement("div");
       tags.className = "tags";
-      for (const t of l.tags) {
+      for (const t of l.models) {
         const s = document.createElement("span");
         s.className = "tag";
         s.textContent = t;
@@ -263,18 +400,54 @@ if (LINKS.length === 0) {
       a.appendChild(tags);
     }
 
+    if (l.bonus || l.daily) {
+      const stats = document.createElement("div");
+      stats.className = "stats";
+      if (l.bonus) {
+        const s = document.createElement("span");
+        s.className = "stat";
+        s.append("🎁 注册送 ");
+        const b = document.createElement("b");
+        b.textContent = l.bonus;
+        s.appendChild(b);
+        stats.appendChild(s);
+      }
+      if (l.daily) {
+        const s = document.createElement("span");
+        s.className = "stat";
+        s.append("📅 签到 ");
+        const b = document.createElement("b");
+        b.textContent = l.daily;
+        s.appendChild(b);
+        stats.appendChild(s);
+      }
+      a.appendChild(stats);
+    }
+
+    const meta = [l.signup, l.price].filter(Boolean).join("　·　");
+    if (meta) {
+      const m = document.createElement("div");
+      m.className = "meta";
+      m.textContent = meta;
+      a.appendChild(m);
+    }
+
     const go = document.createElement("span");
     go.className = "go";
     go.append("前往注册 ");
     go.insertAdjacentHTML("beforeend", ARROW);
     a.appendChild(go);
 
-    box.appendChild(a);
+    grid.appendChild(a);
+    idx++;
   });
-}
+
+  sec.appendChild(grid);
+  main.appendChild(sec);
+});
 
 document.getElementById("footer").innerHTML =
-  '已收录 <span class="count">' + LINKS.length + '</span> 个站点 · 由 AbyssWhalen 整理维护<br>链接长期有效，欢迎分享给有需要的朋友';
+  '已收录 <span class="count">' + total + '</span> 个站点 · 由 AbyssWhalen 整理维护<br>价格与赠送额度可能随时间调整，以各站实际页面为准 · 欢迎分享给有需要的朋友';
 </script>
 </body>
 </html>
