@@ -1,1 +1,2 @@
 公益站汇总，全是老牌好用的公益站，有我的AFF链接，走邀请可以获得更多额度
+https://abysswhalen.github.io/aff-links
