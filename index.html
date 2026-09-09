@@ -3,72 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的推荐链接</title>
+<title>好用的公益站汇总</title>
 <style>
+  :root {
+    --text:   #1b1f27;
+    --text-2: #5c6575;
+    --muted:  #99a2b1;
+    --card:   rgba(255,255,255,.72);
+    --border: rgba(30,41,72,.09);
+    --accent: #4f6bf5;
+    --accent-weak: rgba(79,107,245,.10);
+    --glow-1: rgba(99,102,241,.16);
+    --glow-2: rgba(34,211,238,.12);
+    --shadow: 0 10px 30px rgba(30,41,72,.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text:   #e8ebf2;
+      --text-2: #a3adc0;
+      --muted:  #6d7689;
+      --card:   rgba(255,255,255,.045);
+      --border: rgba(255,255,255,.09);
+      --accent: #7d93ff;
+      --accent-weak: rgba(125,147,255,.12);
+      --glow-1: rgba(99,102,241,.22);
+      --glow-2: rgba(34,211,238,.10);
+      --shadow: 0 12px 32px rgba(0,0,0,.45);
+    }
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f6f8;
-    color: #24292f;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: var(--text);
     min-height: 100vh;
-    padding: 40px 16px;
+    padding: 56px 20px 48px;
+    background:
+      radial-gradient(640px 420px at 12% -8%, var(--glow-1), transparent 65%),
+      radial-gradient(720px 480px at 92% 4%, var(--glow-2), transparent 60%),
+      #f7f8fb;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
   }
-  .container { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 24px; text-align: center; margin-bottom: 8px; }
-  .subtitle { text-align: center; color: #6a737d; font-size: 14px; margin-bottom: 32px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  @media (prefers-color-scheme: dark) {
+    body { background-color: #0b0e15; }
+  }
+
+  .container { max-width: 780px; margin: 0 auto; }
+
+  /* ---------- 头部 ---------- */
+  header { text-align: center; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .5px;
+    color: var(--accent);
+    background: var(--accent-weak);
+    border: 1px solid transparent;
+    padding: 6px 14px; border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  .badge .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .45; transform: scale(.8); }
+  }
+  h1 {
+    font-size: clamp(26px, 5.4vw, 36px);
+    font-weight: 800; letter-spacing: .5px;
+  }
+  h1 .grad {
+    background: linear-gradient(120deg, #6366f1, #22d3ee);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .subtitle {
+    margin: 12px auto 0; max-width: 560px;
+    font-size: 15px; line-height: 1.75; color: var(--text-2);
+  }
+
+  /* ---------- 额度提示条 ---------- */
+  .tip {
+    margin: 26px auto 0;
+    display: flex; gap: 12px; align-items: flex-start;
+    max-width: 640px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--accent-weak);
+    font-size: 13.5px; line-height: 1.7; color: var(--text-2);
+    text-align: left;
+  }
+  .tip .icon { font-size: 18px; line-height: 1.4; }
+  .tip b { color: var(--text); font-weight: 600; }
+
+  /* ---------- 站点卡片 ---------- */
+  .grid {
+    margin-top: 34px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
   .card {
-    background: #fff;
-    border: 1px solid #e1e4e8;
-    border-radius: 10px;
-    padding: 20px;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    transition: box-shadow .15s, border-color .15s, transform .15s;
+    position: relative;
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 22px 22px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    text-decoration: none; color: inherit;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 10px rgba(30,41,72,.04);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    animation: rise .55s cubic-bezier(.2,.7,.3,1) both;
   }
-  .card:hover {
-    border-color: #0969da;
-    box-shadow: 0 4px 12px rgba(9,105,218,.12);
-    transform: translateY(-2px);
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .card .name { font-size: 16px; font-weight: 600; }
-  .card .desc { font-size: 13px; color: #6a737d; line-height: 1.5; }
-  .card .go { font-size: 13px; color: #0969da; margin-top: auto; }
-  footer { text-align: center; margin-top: 40px; font-size: 12px; color: #959da5; }
+  .card:hover, .card:focus-visible {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    box-shadow: var(--shadow);
+    outline: none;
+  }
+  .row { display: flex; align-items: center; gap: 13px; }
+  .avatar {
+    flex: none;
+    width: 44px; height: 44px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 19px; font-weight: 700;
+    box-shadow: inset 0 -8px 14px rgba(0,0,0,.14);
+  }
+  .name { font-size: 16.5px; font-weight: 700; letter-spacing: .2px; }
+  .desc { font-size: 13.5px; line-height: 1.7; color: var(--text-2); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .tag {
+    font-size: 11px; font-weight: 600; letter-spacing: .3px;
+    color: var(--muted);
+    padding: 3px 9px; border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+  .go {
+    margin-top: auto; padding-top: 12px;
+    display: flex; align-items: center; gap: 5px;
+    font-size: 13px; font-weight: 600; color: var(--accent);
+  }
+  .go svg { transition: transform .18s ease; }
+  .card:hover .go svg { transform: translate(3px, -3px); }
+
+  /* ---------- 空状态 / 页脚 ---------- */
+  .empty {
+    grid-column: 1 / -1; text-align: center;
+    padding: 48px 20px; color: var(--muted); font-size: 14px;
+    border: 1px dashed var(--border); border-radius: 18px;
+  }
+  footer {
+    margin-top: 44px; text-align: center;
+    font-size: 12.5px; color: var(--muted); line-height: 1.9;
+  }
+  footer .count { color: var(--accent); font-weight: 600; }
+
+  @media (max-width: 480px) {
+    body { padding: 40px 16px 36px; }
+    .grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>我的推荐链接</h1>
-  <p class="subtitle">通过以下链接注册，对站长会有少量支持，感谢！</p>
+
+  <header>
+    <span class="badge"><span class="dot"></span>持续更新</span>
+    <h1>好用的<span class="grad">公益站</span>汇总</h1>
+    <p class="subtitle">我自己在用、体验不错的公益站都收集在这里，长期维护这份清单。</p>
+  </header>
+
+  <div class="tip">
+    <span class="icon">💡</span>
+    <span><b>从下方邀请链接注册，可以获得比直接注册更多的初始额度</b>，而且不损失你本身的任何权益。点击卡片即可直达注册页。</span>
+  </div>
+
   <div class="grid" id="links"></div>
-  <footer>页面由站长维护，链接长期有效</footer>
+
+  <footer id="footer"></footer>
 </div>
 
-<!-- 只需要改这里：往数组里加/删你的 AFF 链接即可 -->
+<!-- ================================================================
+     在这里维护站点列表（其他地方都不用动）
+     name: 站点名   url: 你的邀请链接   desc: 一句话介绍
+     tags: 标签数组，可以不写，不影响显示
+================================================================= -->
 <script>
 const LINKS = [
-  { name: "站点名称 1", url: "https://example.com/aff?code=xxxx", desc: "一句话介绍这个站点是干嘛的" },
-  { name: "站点名称 2", url: "https://example2.com/aff?code=yyyy", desc: "一句话介绍" },
-  { name: "站点名称 3", url: "https://example3.com/aff?code=zzzz", desc: "一句话介绍" },
+  { name: "示例站点 A", url: "https://example.com/aff?code=xxxx", desc: "这是一个示例条目，替换成真实站点即可", tags: ["GPT", "免费"] },
+  { name: "示例站点 B", url: "https://example2.com/aff?code=yyyy", desc: "tags 可以不写，不影响显示" },
 ];
 
+const GRADS = [
+  "linear-gradient(135deg,#6366f1,#8b5cf6)",
+  "linear-gradient(135deg,#0ea5e9,#22d3ee)",
+  "linear-gradient(135deg,#f59e0b,#f97316)",
+  "linear-gradient(135deg,#10b981,#14b8a6)",
+  "linear-gradient(135deg,#ec4899,#f43f5e)",
+];
+const ARROW = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+
 const box = document.getElementById("links");
-for (const l of LINKS) {
-  const a = document.createElement("a");
-  a.className = "card";
-  a.href = l.url;
-  a.target = "_blank";
-  a.rel = "noopener";
-  a.innerHTML =
-    '<span class="name"></span><span class="desc"></span><span class="go">前往注册 →</span>';
-  a.querySelector(".name").textContent = l.name;
-  a.querySelector(".desc").textContent = l.desc;
-  box.appendChild(a);
+
+if (LINKS.length === 0) {
+  const e = document.createElement("div");
+  e.className = "empty";
+  e.textContent = "清单整理中，敬请期待～";
+  box.appendChild(e);
+} else {
+  LINKS.forEach((l, i) => {
+    const a = document.createElement("a");
+    a.className = "card";
+    a.href = l.url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.style.animationDelay = (i * 70) + "ms";
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const av = document.createElement("span");
+    av.className = "avatar";
+    av.style.background = GRADS[i % GRADS.length];
+    av.textContent = (l.name || "?").trim().charAt(0);
+
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = l.name;
+
+    row.appendChild(av);
+    row.appendChild(name);
+    a.appendChild(row);
+
+    const desc = document.createElement("span");
+    desc.className = "desc";
+    desc.textContent = l.desc;
+    a.appendChild(desc);
+
+    if (Array.isArray(l.tags) && l.tags.length) {
+      const tags = document.createElement("div");
+      tags.className = "tags";
+      for (const t of l.tags) {
+        const s = document.createElement("span");
+        s.className = "tag";
+        s.textContent = t;
+        tags.appendChild(s);
+      }
+      a.appendChild(tags);
+    }
+
+    const go = document.createElement("span");
+    go.className = "go";
+    go.append("前往注册 ");
+    go.insertAdjacentHTML("beforeend", ARROW);
+    a.appendChild(go);
+
+    box.appendChild(a);
+  });
 }
+
+document.getElementById("footer").innerHTML =
+  '已收录 <span class="count">' + LINKS.length + '</span> 个站点 · 由 AbyssWhalen 整理维护<br>链接长期有效，欢迎分享给有需要的朋友';
 </script>
 </body>
 </html>
